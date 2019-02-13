@@ -3,11 +3,11 @@ open Ast
 %}
 %token <int> NUM
 %token <string> IDENT
-%token PLUS MINUS TIMES DIV 
-%token CONST FUN REC ECHO 
-%token INT BOOL TRUE FALSE 
+%token PLUS MINUS TIMES DIV
+%token CONST FUN REC ECHO
+%token INT BOOL TRUE FALSE
 %token NOT AND OR EQ LT IF
-%token LBRACKET RBRACKET LPAR RPAR 
+%token LBRACKET RBRACKET LPAR RPAR
 %token COLON SEMICOLON COMMA STAR ARROW
 %token EOL
 %start prog             /* the entry point */
@@ -46,7 +46,7 @@ dec:
 ;
 
 _type:
-	INT  { ASTIntType } 
+	INT  { ASTIntType }
 	| BOOL  { ASTBoolType }
 	| LPAR types ARROW _type RPAR  { ASTArrowType($2,$4) }
 ;
@@ -60,7 +60,7 @@ arg:
 	IDENT COLON _type   { ASTArg($1,$3) }
 ;
 
-args: 
+args:
 	arg  {ASTArg($1)}
 	| arg COMMA args  { ASTArgs($1,$3)}
 ;
@@ -72,7 +72,7 @@ expr:
 	| IDENT { ASTId($1) }
 	| oprim { ASTOprim($1) }
 	| LBRACKET args RBRACKET expr {ASTLambda($2,$4)}
-	| LPAR  expr exprs RPAR {ASTRecur($2,$3)}
+	| LPAR  expr exprs RPAR {ASTApply($2,$3)}
 	| LPAR IF expr expr expr RPAR {ASTIf($3,$4,$5)}
 ;
 

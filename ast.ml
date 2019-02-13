@@ -1,27 +1,27 @@
-type opun = Not 
-type opbin = Add | Mul | Sub | Div | And | Or | Eq | Lt 
+type opun = Not
+type opbin = Add | Mul | Sub | Div | And | Or | Eq | Lt
 
-type _type = 
+type _type =
 	ASTIntType
 	| ASTBoolType
-	| ASTArrowType of types  * _type 
+	| ASTArrowType of types  * _type
 
-and types = 
+and types =
 	ASTType of _type
 	| ASTTypes of _type * types
 
-type arg = 
+type arg =
 	ASTArg of string * _type
 
-type args = 
+type args =
 	ASTArg of arg 
 	| ASTArgs of arg * args
 
-type oprim = 
+type oprim =
 	ASTUnary of opun * expr
-	| ASTBinary of opbin * expr * expr 
+	| ASTBinary of opbin * expr * expr
 
-and expr = 
+and expr =
 	ASTTrue
 	| ASTFalse
 	| ASTNum of int
@@ -31,22 +31,22 @@ and expr =
 	| ASTIf of expr * expr * expr
 	| ASTApply of expr * exprs
 
-and exprs = 
-	ASTExpr of expr 
+and exprs =
+	ASTExpr of expr
 	| ASTExprs of expr * exprs
 
 type stat =
 	ASTEcho of expr
 
-type dec = 
+type dec =
 	ASTConst of string * _type * expr
 	| ASTFun of string * _type * args * expr
 	| ASTFunRec of string * _type * args * expr
 
-type cmds = 
+type cmds =
 	ASTStat of stat
 	| ASTDec of dec * cmds
 	| ASTStats of stat * cmds
 
-type prog = 
+type prog =
 	ASTProg of cmds
