@@ -11,6 +11,7 @@ rule token = parse
 (*identificateurs*)
 | ['a'-'z''A'-'Z']['a'-'z''A'-'Z''0'-'9']* as id { IDENT(id) } 
 (*mots-clefs*)
+| "if"			   { IF }
 | "add"            { PLUS }
 | "sub"            { MINUS }
 | "mul"            { TIMES }
@@ -28,10 +29,11 @@ rule token = parse
 | "or" 		       { OR }
 | "eq"             { EQ }
 | "lt"		       { LT }
+
 (*Symboles réservés*)
 | "["			   { LBRACKET }
 | "]" 			   { RBRACKET }
-| ":"			   { COLON
+| ":"			   { COLON }
 | ";"	           { SEMICOLON }
 | "," 			   { COMMA }
 | "*" 			   { STAR }

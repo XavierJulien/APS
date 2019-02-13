@@ -1,53 +1,52 @@
 type opun = Not 
 type opbin = Add | Mul | Sub | Div | And | Or | Eq | Lt 
 
-type prog = 
-	ASTProg of cmds list
-type cmds = 
-	ASTStat of stat
-	| ASTDec of dec * cmds list
-	| ASTStat of stat * cmds list 
-type stat =
-	ASTEcho of expr
-type dec = 
-	ASTConst of ASTId * _type * expr 
 type _type = 
-	ASTIntType 
-	| ASTBoolType 
-	| ASTArrowType of _type list * _type 
-type types = 
-	_type list
+	ASTIntType
+	| ASTBoolType
+	| ASTArrowType of types  * _type 
+
+and types = 
+	ASTType of _type
+	| ASTTypes of _type * types
+
 type arg = 
-	ASTArg of ASTId * _type
+	ASTArg of string * _type
+
 type args = 
-	arg 
+	ASTArg of arg 
 	| ASTArgs of arg * args
-type expr = 
-	| ASTTrue
+
+type oprim = 
+	ASTUnary of opun * expr
+	| ASTBinary of opbin * expr * expr 
+
+and expr = 
+	ASTTrue
 	| ASTFalse
 	| ASTNum of int
+	| ASTOprim of oprim
 	| ASTId of string
-	| ASTUnary of opun * expr
-	| ASTBinaryBin of opbin * expr * expr
-	| args
-	
-type
+	| ASTLambda of args * expr
+	| ASTIf of expr * expr * expr
+	| ASTApply of expr * exprs
 
+and exprs = 
+	ASTExpr of expr 
+	| ASTExprs of expr * exprs
 
+type stat =
+	ASTEcho of expr
 
+type dec = 
+	ASTConst of string * _type * expr
+	| ASTFun of string * _type * args * expr
+	| ASTFunRec of string * _type * args * expr
 
-let string_of_op op =
-match op with
-Add -> "add"
-| Mul -> "mul"
-| Sub -> "sub"
-| Div -> "div"
+type cmds = 
+	ASTStat of stat
+	| ASTDec of dec * cmds
+	| ASTStats of stat * cmds
 
-let op_of_string op =
-match op with
-"add" -> Add
-| "mul" -> Mul
-| "sub" -> Sub
-| "div" -> Div
-
-
+type prog = 
+	ASTProg of cmds
