@@ -57,7 +57,7 @@ types:
 ;
 
 arg:
-	IDENT COLON _type   { ASTArg($1,$3) }
+	IDENT COLON _type   { ASTArgFin($1,$3) }
 ;
 
 args:

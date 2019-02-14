@@ -11,10 +11,10 @@ and types =
 	| ASTTypes of _type * types
 
 type arg =
-	ASTArg of string * _type
+	ASTArgFin of string * _type
 
 type args =
-	ASTArg of arg 
+	ASTArg of arg
 	| ASTArgs of arg * args
 
 type oprim =

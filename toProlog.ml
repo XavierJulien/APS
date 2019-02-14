@@ -43,7 +43,7 @@ and print_prolog_dec dec =
 	|ASTFun(id,t,args,e) -> (Printf.printf "fun(%s" id;
 													 print_prolog_type t;
 													 Printf.printf ",";
-													 print_prolog_args t;
+													 print_prolog_args args;
 													 Printf.printf ",";
 													 print_prolog_expr e;
 													 Printf.printf ")";
@@ -51,7 +51,7 @@ and print_prolog_dec dec =
 	|ASTFunRec(id,t,args,e) -> (Printf.printf "fun(%s" id;
 													 		print_prolog_type t;
 													 		Printf.printf ",";
-															print_prolog_args t;
+															print_prolog_args args;
 	 													  Printf.printf ",";
 													 		print_prolog_expr e;
 													 		Printf.printf ")";
@@ -132,10 +132,7 @@ and print_prolog_opbin o =
 
 and print_prolog_args args =
   match args with
-	ASTArg(a) -> ( Printf.printf "arg(";
-								 print_prolog_arg a;
-								 Printf.printf ")"
-							 )
+	ASTArg(a) -> print_prolog_arg a;
 	|ASTArgs(a,args) -> ( Printf.printf "args(";
 								 			  print_prolog_arg a;
 								        Printf.printf ",";
@@ -145,7 +142,7 @@ and print_prolog_args args =
 
 and print_prolog_arg arg =
 	match arg with
-	ASTArg(id,t) -> (Printf.printf "arg(";
+	ASTArgFin(id,t) -> (Printf.printf "arg(";
 									 Printf.printf "%s," id;
 								 	 print_prolog_type t;
 								   Printf.printf ")";
