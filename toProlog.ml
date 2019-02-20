@@ -14,33 +14,31 @@ and print_prolog_cmds cmds =
 	 				 )
 	|ASTDec(dec,cmds) -> (Printf.printf "dec(";
 						  print_prolog_dec dec;
-						  Printf.printf ",";
+						  Printf.printf "),";
 						  print_prolog_cmds cmds;
-						  Printf.printf ")"
 						 )
-	|ASTStats(stat,cmds) -> (Printf.printf "stats(";
+	|ASTStats(stat,cmds) -> (Printf.printf "stat(";
 					         print_prolog_stat stat;
-					         Printf.printf ",";
+					         Printf.printf "),";
 					         print_prolog_cmds cmds;
-					         Printf.printf ")"
 					        )
 
 and print_prolog_stat stat =
 	match stat with
 	ASTEcho(e) -> (Printf.printf "echo(";
-	              print_prolog_expr e;
-	              Printf.printf ")"
-	             )
+	               print_prolog_expr e;
+	               Printf.printf ")"
+	              )
 
 and print_prolog_dec dec =
 	match dec with
-	|ASTConst(id,t,e) -> (Printf.printf "const(%s" id;
+	|ASTConst(id,t,e) -> (Printf.printf "const(%s," id;
 												print_prolog_type t;
 												Printf.printf ",";
 												print_prolog_expr e;
 												Printf.printf ")"
 											 )
-	|ASTFun(id,t,args,e) -> (Printf.printf "fun(%s" id;
+	|ASTFun(id,t,args,e) -> (Printf.printf "fun(%s," id;
 													 print_prolog_type t;
 													 Printf.printf ",";
 													 print_prolog_args args;
@@ -48,7 +46,7 @@ and print_prolog_dec dec =
 													 print_prolog_expr e;
 													 Printf.printf ")";
 													)
-	|ASTFunRec(id,t,args,e) -> (Printf.printf "fun(%s" id;
+	|ASTFunRec(id,t,args,e) -> (Printf.printf "funrec(%s," id;
 													 		print_prolog_type t;
 													 		Printf.printf ",";
 															print_prolog_args args;
@@ -59,10 +57,7 @@ and print_prolog_dec dec =
 
 and print_prolog_exprs e =
 	match e with
-	ASTExpr(e) -> (Printf.printf "expr(";
-				   print_prolog_expr e;
-				   Printf.printf ")"
-				   )
+	ASTExpr(e) ->  print_prolog_expr e;
 	|ASTExprs(e,exprs) -> (Printf.printf "exprs(";
 						   print_prolog_expr e;
 						   Printf.printf ",";
@@ -74,9 +69,9 @@ and print_prolog_expr e =
 	match e with
 	ASTTrue -> Printf.printf "true"
 	|ASTFalse -> Printf.printf "false"
-	|ASTNum(n) ->  Printf.printf "%d" n
+	|ASTNum(n) ->  Printf.printf "num(%d)" n
 	|ASTOprim(oprim) -> print_prolog_oprim oprim
-	|ASTId(id) -> Printf.printf "%s" id
+	|ASTId(id) -> Printf.printf "id(%s)" id
 	|ASTLambda(args,e) -> (Printf.printf "lambda(";
 												 print_prolog_args args;
 							 				 	 Printf.printf ",";
@@ -114,7 +109,14 @@ and print_prolog_oprim op =
 								print_prolog_expr e2;
 								Printf.printf ")"
 								)
-
+	|ASTBinaryBool(opbinbool,e1,e2) -> (Printf.printf "opbinbool(";
+								print_prolog_opbinbool opbinbool;
+								Printf.printf ",";
+								print_prolog_expr e1;
+								Printf.printf ",";
+								print_prolog_expr e2;
+								Printf.printf ")"
+								)
 and print_prolog_opun o =
 	match o with
 	Not -> Printf.printf "not"
@@ -125,7 +127,10 @@ and print_prolog_opbin o =
 	|Mul -> Printf.printf "mul"
 	|Sub -> Printf.printf "sub"
 	|Div -> Printf.printf "div"
-	|And -> Printf.printf "and"
+
+and print_prolog_opbinbool o =
+	match o with
+	And -> Printf.printf "and"
 	|Or -> Printf.printf "or"
 	|Eq -> Printf.printf "eq"
 	|Lt -> Printf.printf "lt";
@@ -134,18 +139,18 @@ and print_prolog_args args =
   match args with
 	ASTArg(a) -> print_prolog_arg a;
 	|ASTArgs(a,args) -> ( Printf.printf "args(";
-								 			  print_prolog_arg a;
-								        Printf.printf ",";
-												print_prolog_args args;
-								        Printf.printf ")"
-							        )
+						  print_prolog_arg a;
+						  Printf.printf ",";
+						  print_prolog_args args;
+						  Printf.printf ")"
+						)
 
 and print_prolog_arg arg =
 	match arg with
 	ASTArgFin(id,t) -> (Printf.printf "arg(";
-									 Printf.printf "%s," id;
-								 	 print_prolog_type t;
-								   Printf.printf ")";
+						Printf.printf "%s," id;
+						print_prolog_type t;
+						Printf.printf ")";
 									)
 
 and print_prolog_type t =
@@ -161,10 +166,7 @@ and print_prolog_type t =
 
 and print_prolog_types types =
 	match types with
-	ASTType(t) -> (Printf.printf "type(";
-								 print_prolog_type t;
-								 Printf.printf ")"
-								)
+	ASTType(t) -> print_prolog_type t;
 	|ASTTypes(t,types) -> (Printf.printf "types(";
 								 				 print_prolog_type t;
 												 Printf.printf ",";
@@ -174,7 +176,8 @@ and print_prolog_types types =
 
 let _ =
 	try
-	let lexbuf = Lexing.from_channel stdin in
+	let fichier = open_in Sys.argv.(1) in
+	let lexbuf = Lexing.from_channel fichier in
 	let e = Parser.prog Lexer.token lexbuf in
 	print_prolog_prog e;
 	print_char '\n'

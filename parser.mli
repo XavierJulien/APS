@@ -28,7 +28,6 @@ type token =
   | COMMA
   | STAR
   | ARROW
-  | EOL
 
 val prog :
   (Lexing.lexbuf  -> token) -> Lexing.lexbuf -> Ast.prog

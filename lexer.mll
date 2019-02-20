@@ -4,12 +4,9 @@ exception Eof
 }
 rule token = parse
 (*Séparateurs*)
-[' ' '\t']       { token lexbuf }     (* skip blanks *)
-| ['\n' ]          { EOL }
+[' ' '\t' '\n']       { token lexbuf }     (* skip blanks *)
 (*constantes numériques*)
 | ('-'?)['0'-'9']+ as lxm { NUM(int_of_string lxm) }
-(*identificateurs*)
-| ['a'-'z''A'-'Z']['a'-'z''A'-'Z''0'-'9']* as id { IDENT(id) } 
 (*mots-clefs*)
 | "if"			   { IF }
 | "add"            { PLUS }
@@ -40,4 +37,5 @@ rule token = parse
 | "->"			   { ARROW }
 | "("              { LPAR }
 | ")"              { RPAR }
-| eof              { raise Eof }
+(*identificateurs*)
+|  ['a'-'z''A'-'Z']['a'-'z''A'-'Z''0'-'9']* as id { IDENT(id) } 

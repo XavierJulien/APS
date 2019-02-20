@@ -9,7 +9,6 @@ open Ast
 %token NOT AND OR EQ LT IF
 %token LBRACKET RBRACKET LPAR RPAR
 %token COLON SEMICOLON COMMA STAR ARROW
-%token EOL
 %start prog             /* the entry point */
 
 %type <Ast.prog> prog
@@ -82,10 +81,10 @@ oprim :
 	| LPAR TIMES expr expr RPAR  { ASTBinary(Ast.Mul, $3, $4) }
 	| LPAR DIV expr expr RPAR  { ASTBinary(Ast.Div, $3, $4) }
 	| LPAR NOT expr RPAR  { ASTUnary(Ast.Not, $3) }
-	| LPAR AND expr expr RPAR  { ASTBinary(Ast.And, $3, $4) }
-	| LPAR OR expr expr RPAR  { ASTBinary(Ast.Or, $3, $4) }
-	| LPAR EQ expr expr RPAR  { ASTBinary(Ast.Eq, $3, $4) }
-	| LPAR LT expr expr RPAR  { ASTBinary(Ast.Lt, $3, $4) }
+	| LPAR AND expr expr RPAR  { ASTBinaryBool(Ast.And, $3, $4) }
+	| LPAR OR expr expr RPAR  { ASTBinaryBool(Ast.Or, $3, $4) }
+	| LPAR EQ expr expr RPAR  { ASTBinaryBool(Ast.Eq, $3, $4) }
+	| LPAR LT expr expr RPAR  { ASTBinaryBool(Ast.Lt, $3, $4) }
 ;
 
 exprs:

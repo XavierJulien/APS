@@ -1,6 +1,6 @@
 type opun = Not
-type opbin = Add | Mul | Sub | Div | And | Or | Eq | Lt
-
+type opbin = Add | Mul | Sub | Div
+type opbinbool = And | Or | Eq | Lt
 type _type =
 	ASTIntType
 	| ASTBoolType
@@ -20,6 +20,7 @@ type args =
 type oprim =
 	ASTUnary of opun * expr
 	| ASTBinary of opbin * expr * expr
+	| ASTBinaryBool of opbinbool * expr * expr
 
 and expr =
 	ASTTrue
