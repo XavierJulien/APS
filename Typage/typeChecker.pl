@@ -22,9 +22,12 @@ typeStat(C,echo(X),void) :-
 	typeExpr(C,X,int).
 /*(DEC)*/
 typeCmds(C,cmds(X,Y),void) :-
-	typeDec(C,X,void),
-	typeCmds(C,Y,void).
+	typeDec(C,X,void,CBIS),
+	typeCmds(CBIS,Y,void).
 /*(CONST)*/
+typeDec(C,const(X,TYPE,EXPR),void,CBIS) :-
+	typeExpr(C,EXPR,TYPE),
+	CBIS is (X,EXPR)|C
 /*******************************************************A FAIRE*/
 /*(FUN)*/
 /*******************************************************A FAIRE*/
@@ -49,8 +52,8 @@ typeExpr(C,if(COND,E1,E2),T) :-
 	typeExpr(C,E2,T).	
 /********************************************************A FINIR*/
 /*(APP)*/
-typeExpr(C,apply(F,ARGS),T) :-	
-	typeExpr(C,F,assoc(F,C,aveclafleche)),
+typeExpr(C,apply(id(F),ARGS),T) :-	
+	typeExpr(C,id(F),assoc(F,C,aveclafleche)),
 	typeExpr(C,ARGS,avantlafleche)./*a completer*/
 	typeExpr(C,T,apreslafleche).
 /******************************************************* A FINIR*/
