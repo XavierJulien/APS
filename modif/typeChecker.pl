@@ -1,6 +1,6 @@
 main_stdin :-
 	read(user_input,T),
-	typeProg(T,R),
+	typeProg([],T,R),
 	print(R),
 	nl,
 	exitCode(R).
@@ -17,6 +17,9 @@ typeProg(C,prog(X),void) :-
 /*(END)*/
 /*******************************************************A FAIRE*/
 /*(STAT)*/
+typeCmds(C,stat(X),void) :-
+	typeStat(C,X,void).
+
 typeCmds(C,cmds(stat(X)),void) :-
 	typeStat(C,X,void).
 
@@ -39,21 +42,19 @@ typeDec(C,const(X,TYPE,EXPR),CBIS) :-
 typeDec(C,fun(ID,TYPE,(X,T),BODY),CBIS):-
 	append([(X,T)],C,CTER),
 	typeExpr(CTER,BODY,TYPE),
-	get_typeargs(ARGS,RES),
-	CBIS=(ID,[arrow_type(RES,TYPE)|C]).
+	get_typeargs((X,T),RES),
+	CBIS=[(ID,arrow_type(RES,TYPE))|C].
 
 
 typeDec(C,fun(ID,TYPE,ARGS,BODY),CBIS):-
 	append(ARGS,C,CTER),
 	typeExpr(CTER,BODY,TYPE),
 	get_typeargs(ARGS,RES),
-	CBIS=(ID,[arrow_type(RES,TYPE)|C]).
+	CBIS=[(ID,arrow_type(RES,TYPE))|C].
 
 get_typeargs([],[]).
 get_typeargs([(_,T)|ARGS],[T|RES]) :-
 	get_typeargs(ARGS,RES).
-
-
 /*******************************************************A FAIRE*/
 /*(FUN REC)*/
 /*******************************************************A FAIRE*/
@@ -72,11 +73,11 @@ typeExpr(C,if(COND,E1,E2),T) :-
 	typeExpr(C,COND,bool),
 	typeExpr(C,E1,T),
 	typeExpr(C,E2,T).
-/********************************************************A FINIR
+/********************************************************A FINIR*/
 /*(APP)*/
 typeExpr(C,apply(id(F),ARGS),T) :-
-	typeExpr(C,id(F),assoc(F,C,aveclafleche)),
-	typeExpr(C,ARGS,avantlafleche),/*a completer*/
+	typeExpr(C,id(F),assoc(F,C,)),
+	typeExpr(C,ARGS,get_typeargs()),/*a completer*/
 	typeExpr(C,T,apreslafleche).
 /******************************************************* A FINIR*/
 /*(ABS)*/
@@ -115,3 +116,6 @@ typeExpr(C,eq(X,Y),bool) :-
 typeExpr(C,lt(X,Y),bool) :-
 	typeExpr(C,X,int),
 	typeExpr(C,Y,int).
+
+typeExpr(C,not(X),bool) :-
+	typeExpr(C,X,bool).

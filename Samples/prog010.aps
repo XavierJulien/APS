@@ -1,4 +1,4 @@
 [
-  FUN f int [x:int,y:int,z:int] (add z (add x y));
-  ECHO (f 3 37 3)
+  FUN f int [x:int] (add x 5);
+  ECHO (f 3)
 ]
