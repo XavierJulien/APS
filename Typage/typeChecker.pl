@@ -1,9 +1,7 @@
 main_stdin :-
 	read(user_input,T),
-	typeProg(T,R),
-	print(R),
-	nl,
-	exitCode(R).
+	typeProg([],T,R),
+	print(R).
 
 mem(X, [X|_]).
 mem(X, [_|XS]) :- mem(X,XS).
@@ -14,49 +12,72 @@ assoc(X, [_|XS], V) :- assoc(X, XS, V).
 /*(PROG)*/
 typeProg(C,prog(X),void) :-
 	typeCmds(C,X,void).
-/*(END)*/
-/*******************************************************A FAIRE*/
-/*(STAT)*/
-typeCmds(C,cmds(stat(X)),void) :-
-	typeStat(C,X,void).
 
-typeCmds(C,cmds(stat(X),Y),void) :-
+/*(END)*/
+typeCmds(_,[epsilon],void).
+
+/*(STAT)*/
+/*typeCmds(C,[stat(X)],void) :-
+	typeStat(C,X,void).      plus besoin de ça grace à epsilon*/ 
+
+typeCmds(C,[stat(X)|Y],void) :-
 	typeStat(C,X,void),
 	typeCmds(C,Y,void).
+
 /*(DEC)*/
-typeCmds(C,cmds(dec(X),Y),void) :-
+typeCmds(C,[dec(X)|Y],void) :-
 	typeDec(C,X,CBIS),
 	typeCmds(CBIS,Y,void).
-/*(ECHO)*/
+
+/*(ECHO) d'un int seulement*/
 typeStat(C,echo(X),void) :-
 	typeExpr(C,X,int).
-/*(CONST)*/
-typeDec(C,const(X,TYPE,EXPR),CBIS) :-
-	typeExpr(C,EXPR,TYPE),
-	CBIS=[(X,TYPE)|C].
-/*(FUN)*/
 
-typeDec(C,fun(ID,TYPE,(X,T),BODY),CBIS):-
-	append([(X,T)],C,CTER),
-	typeExpr(CTER,BODY,TYPE),
-	get_typeargs(ARGS,RES),
-	CBIS=(ID,[arrow_type(RES,TYPE)|C]).
-
-
-typeDec(C,fun(ID,TYPE,ARGS,BODY),CBIS):-
-	append(ARGS,C,CTER),
-	typeExpr(CTER,BODY,TYPE),
-	get_typeargs(ARGS,RES),
-	CBIS=(ID,[arrow_type(RES,TYPE)|C]).
 
 get_typeargs([],[]).
 get_typeargs([(_,T)|ARGS],[T|RES]) :-
 	get_typeargs(ARGS,RES).
 
 
-/*******************************************************A FAIRE*/
+/*(CONST)*/
+typeDec(C,const(X,TYPE,EXPR),CBIS) :-
+	typeExpr(C,EXPR,TYPE),
+	CBIS=[(X,TYPE)|C].
+
+
+/*(FUN)*/
+
+/*typeDec(C,fun(ID,TYPE,(X,T),BODY),CBIS):-
+	append([(X,T)],C,CTER),
+	typeExpr(CTER,BODY,TYPE),
+	get_typeargs([(X,T)],RES),
+	CBIS=[(ID,arrow(RES,TYPE))|C].
+*/
+
+typeDec(C,fun(ID,TYPE,ARGS,BODY),CBIS):-
+	append(ARGS,C,CTER),
+	typeExpr(CTER,BODY,TYPE),
+	get_typeargs(ARGS,RES),
+	CBIS=[(ID,arrow(RES,TYPE))|C].
+
+
+
+/**********************************/
 /*(FUN REC)*/
-/*******************************************************A FAIRE*/
+typeDec(C,funrec(ID,TYPE,ARGS,BODY),CBIS):-
+	get_typeargs(ARGS,RES),
+	append(ARGS,C,CTER),
+	C4 = [(ID,arrow(RES,TYPE))|CTER],
+	typeExpr(C4,BODY,TYPE),
+	CBIS=[(ID,arrow(RES,TYPE))|C].
+
+/**********************************/
+verif(_,[],[]).
+verif(C,[ARG|ARGS],[ARGTYPE|ARGSTYPE]) :-
+	typeExpr(C,ARG,ARGTYPE),
+	verif(C,ARGS,ARGSTYPE).
+
+
 /*(TRUE)*/
 typeExpr(_,true,bool).
 /*(FALSE)*/
@@ -72,14 +93,20 @@ typeExpr(C,if(COND,E1,E2),T) :-
 	typeExpr(C,COND,bool),
 	typeExpr(C,E1,T),
 	typeExpr(C,E2,T).
-/********************************************************A FINIR
+/********************************************************A FINIR*/
 /*(APP)*/
-typeExpr(C,apply(id(F),ARGS),T) :-
-	typeExpr(C,id(F),assoc(F,C,aveclafleche)),
-	typeExpr(C,ARGS,avantlafleche),/*a completer*/
-	typeExpr(C,T,apreslafleche).
+typeExpr(C,apply(id(F),ARGS),TYPEF) :-
+	assoc(F,C,arrow(ARGSTYPE,TYPEF)),
+	verif(C,ARGS,ARGSTYPE).
+	
+
+	
 /******************************************************* A FINIR*/
 /*(ABS)*/
+typeExpr(C,lambda(ARGS,BODY),arrow(_,TYPEF)) :-
+	append(ARGS,C,CBIS),
+	typeExpr(CBIS,BODY,TYPEF).		
+
 /*******************************************************A FAIRE*/
 
 /*Opérations mathématiques*/

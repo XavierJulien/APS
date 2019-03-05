@@ -1,16 +1,17 @@
 open Ast
 let rec print_prolog_prog e =
 	match e with
-	ASTProg(cmds) -> (Printf.printf "prog(cmds(";
+	ASTProg(cmds) -> (Printf.printf "prog([";
 					 					print_prolog_cmds cmds;
-					 					Printf.printf "))"
+					 					Printf.printf "])"
 									 )
 
 and print_prolog_cmds cmds =
 	match cmds with
 	 ASTStat(stat) -> (Printf.printf "stat(";
 	 				  print_prolog_stat stat;
-	 				  Printf.printf ")"
+	 				  Printf.printf ")";
+	 				  Printf.printf ",epsilon"
 	 				 )
 	|ASTDec(dec,cmds) -> (Printf.printf "dec(";
 						  print_prolog_dec dec;
@@ -69,6 +70,15 @@ and print_prolog_exprs e =
 						   Printf.printf ")"
 						   )
 
+
+and print_prolog_params params = 
+match params with
+	ASTExpr(e) ->  print_prolog_expr e;
+	|ASTExprs(e,params) -> (print_prolog_expr e;
+						   Printf.printf ",";
+						   print_prolog_params params;
+						   )
+
 and print_prolog_expr e =
 	match e with
 	ASTTrue -> Printf.printf "true"
@@ -92,11 +102,11 @@ and print_prolog_expr e =
 						 print_prolog_expr e3;
 						 Printf.printf ")"
 						 )
-	|ASTApply(e,exprs) -> (Printf.printf "apply(";
+	|ASTApply(e,params) -> (Printf.printf "apply(";
 												 print_prolog_expr e;
-												 Printf.printf ",";
-												 print_prolog_exprs exprs;
-												 Printf.printf ")"
+												 Printf.printf ",[";
+												 print_prolog_params params;
+												 Printf.printf "])"
 												)
 
 and print_prolog_oprim op =
@@ -155,9 +165,9 @@ and print_prolog_type t =
 	match t with
 	ASTIntType -> Printf.printf "int"
 	|ASTBoolType -> Printf.printf "bool"
-	|ASTArrowType(types,t) -> (Printf.printf "arrow_type(";
+	|ASTArrowType(types,t) -> (Printf.printf "arrow([";
 								 	 					 print_prolog_types types;
-								   			 	   Printf.printf ",";
+								   			 	   Printf.printf "],";
 														 print_prolog_type t;
 								   			 	   Printf.printf ")"
 									)

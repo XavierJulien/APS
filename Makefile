@@ -4,6 +4,7 @@ OCAMLC = ocamlc
 
 toProlog: parser toProlog.ml
 	$(OCAMLC) -o toProlog ast.cmo lexer.cmo parser.cmo toProlog.ml
+	
 
 
 parser: ast.ml lexer.mll parser.mly
