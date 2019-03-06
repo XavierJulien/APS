@@ -1,7 +1,8 @@
 main_stdin :-
 	read(user_input,T),
 	typeProg([],T,R),
-	print(R).
+	print(R),
+	exitCode(R).
 
 mem(X, [X|_]).
 mem(X, [_|XS]) :- mem(X,XS).
@@ -16,9 +17,6 @@ typeProg(C,prog(X),void) :-
 /*(END)*/
 typeCmds(_,[epsilon],void).
 
-/*(STAT)*/
-/*typeCmds(C,[stat(X)],void) :-
-	typeStat(C,X,void).      plus besoin de ça grace à epsilon*/ 
 
 typeCmds(C,[stat(X)|Y],void) :-
 	typeStat(C,X,void),
@@ -46,13 +44,6 @@ typeDec(C,const(X,TYPE,EXPR),CBIS) :-
 
 
 /*(FUN)*/
-
-/*typeDec(C,fun(ID,TYPE,(X,T),BODY),CBIS):-
-	append([(X,T)],C,CTER),
-	typeExpr(CTER,BODY,TYPE),
-	get_typeargs([(X,T)],RES),
-	CBIS=[(ID,arrow(RES,TYPE))|C].
-*/
 
 typeDec(C,fun(ID,TYPE,ARGS,BODY),CBIS):-
 	append(ARGS,C,CTER),

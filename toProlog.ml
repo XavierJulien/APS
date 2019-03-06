@@ -1,12 +1,5 @@
 open Ast
-let rec print_prolog_prog e =
-	match e with
-	ASTProg(cmds) -> (Printf.printf "prog([";
-					 					print_prolog_cmds cmds;
-					 					Printf.printf "])"
-									 )
-
-and print_prolog_cmds cmds =
+let rec print_prolog_cmds cmds =
 	match cmds with
 	 ASTStat(stat) -> (Printf.printf "stat(";
 	 				  print_prolog_stat stat;
@@ -166,10 +159,10 @@ and print_prolog_type t =
 	ASTIntType -> Printf.printf "int"
 	|ASTBoolType -> Printf.printf "bool"
 	|ASTArrowType(types,t) -> (Printf.printf "arrow([";
-								 	 					 print_prolog_types types;
-								   			 	   Printf.printf "],";
-														 print_prolog_type t;
-								   			 	   Printf.printf ")"
+							   print_prolog_types types;
+							   Printf.printf "],";
+							   print_prolog_type t;
+							   Printf.printf ")"
 									)
 
 and print_prolog_types types =
@@ -181,6 +174,12 @@ and print_prolog_types types =
 												 print_prolog_types types;
 								 			 	 Printf.printf ")"
 												)
+let print_prolog_prog e =
+	match e with
+	ASTProg(cmds) -> (Printf.printf "prog([";
+					 					print_prolog_cmds cmds;
+					 					Printf.printf "])"
+									 )
 
 let _ =
 	try
