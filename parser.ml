@@ -430,7 +430,7 @@ let yyact = [|
     let _4 = (Parsing.peek_val __caml_parser_env 1 : Ast.expr) in
     Obj.repr(
 # 84 "parser.mly"
-                            ( ASTBinaryBool(Ast.And, _3, _4) )
+                            ( ASTBinary(Ast.And, _3, _4) )
 # 435 "parser.ml"
                : Ast.oprim))
 ; (fun __caml_parser_env ->
@@ -438,7 +438,7 @@ let yyact = [|
     let _4 = (Parsing.peek_val __caml_parser_env 1 : Ast.expr) in
     Obj.repr(
 # 85 "parser.mly"
-                           ( ASTBinaryBool(Ast.Or, _3, _4) )
+                           ( ASTBinary(Ast.Or, _3, _4) )
 # 443 "parser.ml"
                : Ast.oprim))
 ; (fun __caml_parser_env ->
@@ -446,7 +446,7 @@ let yyact = [|
     let _4 = (Parsing.peek_val __caml_parser_env 1 : Ast.expr) in
     Obj.repr(
 # 86 "parser.mly"
-                           ( ASTBinaryBool(Ast.Eq, _3, _4) )
+                           ( ASTBinary(Ast.Eq, _3, _4) )
 # 451 "parser.ml"
                : Ast.oprim))
 ; (fun __caml_parser_env ->
@@ -454,7 +454,7 @@ let yyact = [|
     let _4 = (Parsing.peek_val __caml_parser_env 1 : Ast.expr) in
     Obj.repr(
 # 87 "parser.mly"
-                           ( ASTBinaryBool(Ast.Lt, _3, _4) )
+                           ( ASTBinary(Ast.Lt, _3, _4) )
 # 459 "parser.ml"
                : Ast.oprim))
 ; (fun __caml_parser_env ->

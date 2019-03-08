@@ -114,12 +114,7 @@ and print_prolog_oprim op =
 								print_prolog_expr e2;
 								Printf.printf ")"
 								)
-	|ASTBinaryBool(opbinbool,e1,e2) -> (print_prolog_opbinbool opbinbool;
-								print_prolog_expr e1;
-								Printf.printf ",";
-								print_prolog_expr e2;
-								Printf.printf ")"
-								)
+
 and print_prolog_opun o =
 	match o with
 	Not -> Printf.printf "not("
@@ -130,13 +125,10 @@ and print_prolog_opbin o =
 	|Mul -> Printf.printf "mul("
 	|Sub -> Printf.printf "sub("
 	|Div -> Printf.printf "div("
-
-and print_prolog_opbinbool o =
-	match o with
-	And -> Printf.printf "and("
+	|And -> Printf.printf "and("
 	|Or -> Printf.printf "or("
 	|Eq -> Printf.printf "eq("
-	|Lt -> Printf.printf "lt(";
+	|Lt -> Printf.printf "lt("
 
 and print_prolog_args args =
   match args with
@@ -151,8 +143,8 @@ and print_prolog_arg arg =
 	ASTArgFin(id,t) -> (Printf.printf "(";
 						Printf.printf "%s," id;
 						print_prolog_type t;
-						Printf.printf ")";
-									)
+						Printf.printf ")"
+					)
 
 and print_prolog_type t =
 	match t with
