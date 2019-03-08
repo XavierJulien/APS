@@ -90,6 +90,9 @@ typeExpr(C,apply(id(F),ARGS),TYPEF) :-
 	assoc(F,C,arrow(ARGSTYPE,TYPEF)),
 	verif(C,ARGS,ARGSTYPE).
 	
+typeExpr(C,apply(L,BODY),TYPEF) :-
+	typeExpr(C,L,TYPEF),
+	typeExpr(C,BODY,TYPEF)
 
 	
 /******************************************************* A FINIR*/
