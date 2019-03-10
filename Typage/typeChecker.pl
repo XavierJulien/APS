@@ -45,11 +45,11 @@ typeDec(C,const(X,TYPE,EXPR),CBIS) :-
 
 /*(FUN)*/
 
-typeDec(C,fun(ID,TYPE,ARGS,BODY),CBIS):-
+typeDec(C,fun(ID,TYPERETOUR,ARGS,BODY),CBIS):-
 	append(ARGS,C,CTER),
-	typeExpr(CTER,BODY,TYPE),
+	typeExpr(CTER,BODY,TYPERETOUR),
 	get_typeargs(ARGS,RES),
-	CBIS=[(ID,arrow(RES,TYPE))|C].
+	CBIS=[(ID,arrow(RES,TYPERETOUR))].
 
 
 
@@ -67,6 +67,11 @@ verif(_,[],[]).
 verif(C,[ARG|ARGS],[ARGTYPE|ARGSTYPE]) :-
 	typeExpr(C,ARG,ARGTYPE),
 	verif(C,ARGS,ARGSTYPE).
+
+get_type([],[]).
+get_type([A|ARGS],[T|TYPES]) :-
+	typeExpr([],A,T),
+	get_type(ARGS,TYPES).
 
 
 /*(TRUE)*/
@@ -86,6 +91,9 @@ typeExpr(C,if(COND,E1,E2),T) :-
 	typeExpr(C,E2,T).
 /********************************************************A FINIR*/
 /*(APP)*/
+
+
+
 typeExpr(C,apply(id(F),ARGS),TYPEF) :-
 	assoc(F,C,arrow(ARGSTYPE,TYPEF)),
 	verif(C,ARGS,ARGSTYPE).
@@ -95,6 +103,11 @@ typeExpr(C,apply(lambda(ARGSTYPE,BODY),ARGS),TYPEF) :-
 	verif(C,ARGS,RES),
 	append(ARGSTYPE,C,CBIS),
 	typeExpr(CBIS,BODY,TYPEF).
+
+typeExpr(C,apply(apply(X,Y),ARGS),TYPERETOUR) :-
+	get_type(ARGS,RES),
+	typeExpr(C,apply(X,Y),arrow(RES,TYPERETOUR)).
+
 	
 /******************************************************* A FINIR*/
 /*(ABS)*/
