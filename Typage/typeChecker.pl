@@ -89,11 +89,12 @@ typeExpr(C,if(COND,E1,E2),T) :-
 typeExpr(C,apply(id(F),ARGS),TYPEF) :-
 	assoc(F,C,arrow(ARGSTYPE,TYPEF)),
 	verif(C,ARGS,ARGSTYPE).
-	
-typeExpr(C,apply(L,BODY),TYPEF) :-
-	typeExpr(C,L,TYPEF),
-	typeExpr(C,BODY,TYPEF)
 
+typeExpr(C,apply(lambda(ARGSTYPE,BODY),ARGS),TYPEF) :-
+	get_typeargs(ARGSTYPE,RES),
+	verif(C,ARGS,RES),
+	append(ARGSTYPE,C,CBIS),
+	typeExpr(CBIS,BODY,TYPEF).
 	
 /******************************************************* A FINIR*/
 /*(ABS)*/
