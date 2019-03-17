@@ -52,7 +52,7 @@ let rec eval_args env args =
 and eval_cmds env s ast =
 	match ast with
 	|ASTStat(stat) -> eval_stat env s stat
-	|ASTDec(dec,cmds) -> eval_dec env dec; eval_cmds env s cmds
+	|ASTDec(dec,cmds) -> let new_env = eval_dec env dec in eval_cmds new_env s cmds
 	|ASTStats(stat,cmds) -> eval_stat env s stat; eval_cmds env s cmds
 
 and eval_stat env s ast =
@@ -61,10 +61,10 @@ and eval_stat env s ast =
 
 and eval_dec env ast =
 	match ast with
-	|ASTConst(id,t,e) -> let v = eval_expr env e in (id,v)::!env
-	|ASTFun(id,t,args,e) -> (id,InF(e,parse_args args,!env))::!env
+	|ASTConst(id,t,e) -> let v = eval_expr env e in ref ((id,v)::!env)
+	|ASTFun(id,t,args,e) -> ref ((id,InF(e,parse_args args,!env))::!env)
 	|ASTFunRec(id,t,args,e) -> let params = parse_args args in
-								 (id,InFR(id,InF(e,params,!env)))::!env
+								 ref ((id,InFR(id,InF(e,params,!env)))::!env)
 
 
 and eval_expr env ast =
