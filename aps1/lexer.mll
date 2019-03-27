@@ -46,4 +46,4 @@ rule token = parse
 | "("              { LPAR }
 | ")"              { RPAR }
 (*identificateurs*)
-|  ['a'-'z''A'-'Z']['a'-'z''A'-'Z''0'-'9']* as id { IDENT(id) } 
+|  ['a'-'z''A'-'Z']['a'-'z''A'-'Z''0'-'9']* as id { IDENT(id) }

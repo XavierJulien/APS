@@ -10,10 +10,10 @@ eval : toProlog
 
 toProlog: parser toProlog.ml
 	$(OCAMLC) -o toProlog ast.cmo lexer.cmo parser.cmo toProlog.ml
-	
 
 
-parser: 
+
+parser:
 	$(OCAMLC) -c ast.ml
 	$(LEX_ML) -o lexer.ml lexer.mll
 	$(YACC_ML) -b parser parser.mly
@@ -28,3 +28,4 @@ clean:
 	rm -f lexer.ml
 	rm -f parser.mli
 	rm -f parser.ml
+	rm -f eval

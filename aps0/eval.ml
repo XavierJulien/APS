@@ -61,10 +61,10 @@ and eval_stat env s ast =
 
 and eval_dec env ast =
 	match ast with
-	|ASTConst(id,t,e) -> let v = eval_expr env e in ref ((id,v)::!env)
-	|ASTFun(id,t,args,e) -> ref ((id,InF(e,parse_args args,!env))::!env)
+	|ASTConst(id,t,e) -> let v = eval_expr env e in (id,v)::env
+	|ASTFun(id,t,args,e) -> (id,InF(e,parse_args args,env))::env
 	|ASTFunRec(id,t,args,e) -> let params = parse_args args in
-								 ref ((id,InFR(id,InF(e,params,!env)))::!env)
+								 (id,InFR(id,InF(e,params,env)))::env
 
 
 and eval_expr env ast =
@@ -72,15 +72,15 @@ and eval_expr env ast =
 	ASTTrue -> InN(1)
 	|ASTFalse -> InN(0)
 	|ASTNum(n) -> InN(n)
-	|ASTId(id) -> (List.assoc id !env)
-	|ASTLambda(args,e) -> InF(e,parse_args args,!env)
+	|ASTId(id) -> (List.assoc id env)
+	|ASTLambda(args,e) -> InF(e,parse_args args,env)
 	|ASTIf(e1,e2,e3) -> if (eval_expr env e1) = InN(1) then (eval_expr env e2) else (eval_expr env e3)
 	|ASTApply(e,args) -> let eval_e = eval_expr env e  and args_list = eval_args env args in
 												(match eval_e with
-													|InF(body,params,env1) -> let closure_env = ref ((List.map2 (fun x y -> (x,y)) params args_list)@env1) in
+													|InF(body,params,env1) -> let closure_env = (List.map2 (fun x y -> (x,y)) params args_list)@env1 in
 																												eval_expr closure_env body
 													|InFR(f,InF(body,params,env1)) -> let closure_env =
-																													ref ((f,List.assoc f !env)::(List.map2 (fun x y -> (x,y)) params args_list)@env1) in
+																													(f,List.assoc f env)::(List.map2 (fun x y -> (x,y)) params args_list)@env1 in
 													 																eval_expr closure_env body
 													|_ -> failwith "erreur : impossible d'appliquer une valeur entière")
 	|ASTOprim(oprim) -> match oprim with
@@ -103,7 +103,7 @@ and eval_expr env ast =
 let eval_prog ast =
 	match ast with
 	|ASTProg(cmds) -> let sortie = ref "Retour :\n"
-					  and env : (string * valeur) list ref = ref [] in
+					  and env = [] in
 					  	eval_cmds env sortie cmds; !sortie
 
 let _ =
