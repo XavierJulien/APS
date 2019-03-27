@@ -5,6 +5,14 @@ open Ast;;
 type valeur = InN of int
 			| InF of expr * string list * (string * valeur) list
 			| InFR of string * valeur
+			| InA of string
+			| InP of block * string list * (string * valeur) list
+
+let cpt = ref 0
+let alloc mem =
+	let a = "a"^!cpt in
+		cpt:=(!cpt+1);
+		(a,((a,-1)::mem))
 
 let get_int v =
 	match v with
@@ -15,7 +23,6 @@ let get_string v =
 	match v with
 	| InN(e) -> string_of_int e
 	|_ -> failwith "Pas fait"
-
 
 let pi_bin op na nb =
 	match op with
@@ -34,11 +41,11 @@ let pi_un op arg =
 	| "not" -> if arg = 0 then 1 else 0
 	| _ -> failwith " not an unary operator "
 
-
 let rec parse_args args =
 	match args with
 	|ASTArg(a) -> parse_argfin a
 	|ASTArgs(a,args) -> (parse_argfin a)@(parse_args args)
+
 and parse_argfin arg =
 		match arg with
 		|ASTArgFin(id,t) -> id::[]
@@ -48,21 +55,25 @@ let rec eval_args env args =
 		|ASTExpr(a) ->  (eval_expr env a)::[]
 		|ASTExprs(a,abis) -> (eval_expr env a)::(eval_args env abis)
 
-and eval_cmds env s ast =
+and eval_cmds env mem s ast =
 	match ast with
-	|ASTStat(stat) -> eval_stat env s stat
-	|ASTDec(dec,cmds) -> let new_env = eval_dec env dec in eval_cmds new_env s cmds
-	|ASTStats(stat,cmds) -> eval_stat env s stat; eval_cmds env s cmds
+	|ASTStat(stat) -> eval_stat env mem s stat
+	|ASTDec(dec,cmds) -> let (new_env,new_mem) = eval_dec env mem dec in eval_cmds new_env new_mem s cmds
+	|ASTStats(stat,cmds) -> let new_mem = eval_stat env mem s stat; eval_cmds env new_mem s cmds
 
-and eval_stat env s ast =
+and eval_stat env mem s ast =
 	match ast with
-	|ASTEcho(e) -> let res = eval_expr env e in s:=!s^(get_string res)^"\n"
+	|ASTEcho(e) -> let res = eval_expr env mem e in s:=!s^(get_string res)^"\n"
 
-and eval_dec env ast =
+and eval_dec env mem ast =
 	match ast with
 	|ASTConst(id,t,e) -> let v = eval_expr env e in  (id,v)::env
 	|ASTFun(id,t,args,e) -> (id,InF(e,parse_args args,env))::env
 	|ASTFunRec(id,t,args,e) -> let params = parse_args args in
+								 (id,InFR(id,InF(e,params,env)))::env
+	|ASTVar(id,t) -> let (a,new_mem) = alloc(mem) in ((id,InA(a))::env,new_mem)
+	|ASTProc(id,args,e) -> (id,InF(e,parse_args args,env))::env)
+	|ASTProcRec(id,args,e) -> let params = parse_args args in
 								 (id,InFR(id,InF(e,params,env)))::env
 
 
@@ -78,7 +89,7 @@ and eval_expr env ast =
 												(match eval_e with
 													|InF(body,params,env1) -> let closure_env = (List.map2 (fun x y -> (x,y)) params args_list)@env1 in
 																												eval_expr closure_env body
-													|InFR(f,InF(body,params,env1)) -> let closure_env = 
+													|InFR(f,InF(body,params,env1)) -> let closure_env =
 																								(f,List.assoc f env)::(List.map2 (fun x y -> (x,y)) params args_list)@env1 in
 													 															eval_expr closure_env body
 													|_ -> failwith "erreur : impossible d'appliquer une valeur entière")
@@ -102,13 +113,14 @@ and eval_expr env ast =
 let eval_prog ast =
 	match ast with
 	|ASTProg(cmds) -> let sortie = ref "Retour :\n"
-					  and env = [] in
-					  	eval_cmds env sortie cmds; !sortie
+					  			  and env = []
+										and mem = [] in
+					  				eval_cmds env mem sortie cmds;!sortie
 
 let _ =
 	let fic = open_in Sys.argv.(1) in
 	let lexbuf = Lexing.from_channel fic in
 	let ast = Parser.prog Lexer.token lexbuf in
-	let result  = eval_prog ast in
-	print_string result;
+	let sortie  = eval_prog ast in
+	print_string sortie;
 	print_newline();;
