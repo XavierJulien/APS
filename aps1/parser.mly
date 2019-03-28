@@ -43,12 +43,12 @@ cmds:
 block:
 	LBRACKET cmds RBRACKET	{ ASTBlock($2) }
 ;
-/******/	
-	
+/******/
+
 stat:
 	ECHO expr {ASTEcho($2)}
 	/*aps1*/
-	| SET expr expr {ASTSet($2,$3)}
+	| SET IDENT expr {ASTSet($2,$3)}
 	| BIF expr block block {ASTBIf($2,$3,$4)}
 	| WHILE expr block {ASTWhile($2,$3)}
 	| CALL expr exprs {ASTCall($2,$3)}

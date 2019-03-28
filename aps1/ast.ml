@@ -39,9 +39,9 @@ and exprs =
 and stat =
 	ASTEcho of expr
 	(*aps1*)
-	| ASTSet of expr * expr
-	| ASTBIf of expr * block * block 
-	| ASTWhile of expr * block 
+	| ASTSet of string * expr
+	| ASTBIf of expr * block * block
+	| ASTWhile of expr * block
 	| ASTCall of expr * exprs
 
 and dec =
@@ -52,14 +52,14 @@ and dec =
 	| ASTVar of string * _type
 	| ASTProc of string * args * block
 	| ASTProcRec of string * args * block
-	
+
 and cmds =
 	ASTStat of stat
 	| ASTDec of dec * cmds
 	| ASTStats of stat * cmds
 
 (*aps1*)
-and block = 
+and block =
 	ASTBlock of cmds
 
 and prog =

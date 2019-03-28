@@ -77,12 +77,12 @@ and eval_block env mem s ast =
 and eval_stat env mem s ast =
 	match ast with
 	|ASTEcho(e) ->let res = eval_expr env mem e in s:=!s^(get_string res)^"\n";(mem,s)
-	(* |ASTSet(id,e) ->(match List.assoc id env with
+	|ASTSet(id,e) ->(match List.assoc id env with
 										InA(a)-> let v = (List.assoc a mem)
 														 and affect = eval_expr env mem e in
 														 	 v:= affect;
 															 (mem,s)
-										|_ -> failwith "Error set : not a InA") *)
+										|_ -> failwith "Error SET : not a InA")
 	 |ASTBIf(e,b1,b2) -> if (eval_expr env mem e) = InN(1) then (eval_block env mem s b1) else (eval_block env mem s b2)
 	 |ASTWhile(e,b) ->
 			if (eval_expr env mem e) = InN(0)

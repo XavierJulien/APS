@@ -17,8 +17,8 @@ let rec print_prolog_cmds cmds =
 					         print_prolog_cmds cmds;
 					        )
 (*aps1*)
-and print_prolog_block block = 
-	match block with 
+and print_prolog_block block =
+	match block with
 	ASTBlock(cmds) -> (Printf.printf "block([";
 					   print_prolog_cmds cmds;
 					   Printf.printf "])"
@@ -30,9 +30,8 @@ and print_prolog_stat stat =
 	               print_prolog_expr e;
 	               Printf.printf ")"
 	              )
-	|ASTSet(id,e)-> (Printf.printf "set("; 
-					 print_prolog_expr id;
-					 Printf.printf ",";
+	|ASTSet(id,e)-> (Printf.printf "set(id(%s" id;
+					 Printf.printf "),";
 					 print_prolog_expr e;
 					 Printf.printf ")"
 					)
@@ -118,7 +117,7 @@ and print_prolog_exprs e =
 						   )
 
 
-and print_prolog_params params = 
+and print_prolog_params params =
 match params with
 	ASTExpr(e) ->  print_prolog_expr e;
 	|ASTExprs(e,params) -> (print_prolog_expr e;
