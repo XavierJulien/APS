@@ -24,6 +24,16 @@ and print_prolog_block block =
 					   Printf.printf "])"
 					  )
 
+and print_prolog_lval lval =
+ 	match lval with
+ 	ASTLId(id) -> Printf.printf "id(%s)" id
+ 	|ASTLNth(lval,e)->  (Printf.printf "nth(";
+												 print_prolog_lval lval;
+												 Printf.printf ",";
+												 print_prolog_expr e;
+												 Printf.printf ")"
+												)
+
 and print_prolog_stat stat =
 	match stat with
 	ASTEcho(e) -> (Printf.printf "echo(";
@@ -56,6 +66,13 @@ and print_prolog_stat stat =
 							print_prolog_params params;
 							Printf.printf "])"
 						  )
+	(*aps2*)
+	|ASTLval(lval,e) -> (Printf.printf "set(";
+						 print_prolog_lval lval;
+						 Printf.printf ",";
+						 print_prolog_expr e;
+						 Printf.printf ")"
+					  )
 
 and print_prolog_dec dec =
 	match dec with
@@ -117,14 +134,13 @@ and print_prolog_exprs e =
 						   Printf.printf ")"
 						   )
 
-
 and print_prolog_params params =
-match params with
-	ASTExpr(e) ->  print_prolog_expr e;
-	|ASTExprs(e,params) -> (print_prolog_expr e;
-						   Printf.printf ",";
-						   print_prolog_params params;
-						   )
+	match params with
+		ASTExpr(e) ->  print_prolog_expr e;
+		|ASTExprs(e,params) -> (print_prolog_expr e;
+							   Printf.printf ",";
+							   print_prolog_params params;
+							   )
 
 and print_prolog_expr e =
 	match e with
@@ -154,6 +170,21 @@ and print_prolog_expr e =
 												 Printf.printf ",[";
 												 print_prolog_params params;
 												 Printf.printf "])"
+												)
+	(*aps2*)
+	|ASTLen(expr) -> (Printf.printf "len(";
+												 print_prolog_expr expr;
+												 Printf.printf "])"
+												)
+	|ASTAlloc(expr) -> (Printf.printf "alloc(";
+												 print_prolog_expr expr;
+												 Printf.printf ")"
+												)
+	|ASTENth(e1,e2)->  (Printf.printf "nth(";
+												 print_prolog_expr e1;
+												 Printf.printf ",";
+												 print_prolog_expr e2;
+												 Printf.printf ")"
 												)
 
 and print_prolog_oprim op =
@@ -212,6 +243,11 @@ and print_prolog_type t =
 							   print_prolog_type t;
 							   Printf.printf ")"
 									)
+	(*aps2*)
+	|ASTVecType(t) -> (Printf.printf "vec(";
+							   		print_prolog_type t;
+							   		Printf.printf ")"
+										)
 
 and print_prolog_types types =
 	match types with
@@ -222,6 +258,7 @@ and print_prolog_types types =
 												 print_prolog_types types;
 								 			 	 Printf.printf ")"
 												)
+
 let print_prolog_prog e =
 	match e with
 	ASTProg(cmds) -> (Printf.printf "prog([";
