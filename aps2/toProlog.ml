@@ -26,7 +26,7 @@ and print_prolog_block block =
 
 and print_prolog_lval lval =
  	match lval with
- 	ASTLId(id) -> Printf.printf "id(%s)" id
+ 	ASTLId(id) -> print_prolog_expr id
  	|ASTLNth(lval,e)->  (Printf.printf "nth(";
 												 print_prolog_lval lval;
 												 Printf.printf ",";
@@ -40,9 +40,10 @@ and print_prolog_stat stat =
 	               print_prolog_expr e;
 	               Printf.printf ")"
 	              )
-	(*aps1*)
-	|ASTSet(id,e)-> (Printf.printf "set(id(%s" id;
-					 Printf.printf "),";
+	(*aps1*) 
+	|ASTSet(id,e)-> (Printf.printf "set(";
+					 print_prolog_lval id;
+					 Printf.printf ",";
 					 print_prolog_expr e;
 					 Printf.printf ")"
 					)
@@ -66,13 +67,6 @@ and print_prolog_stat stat =
 							print_prolog_params params;
 							Printf.printf "])"
 						  )
-	(*aps2*)
-	|ASTLval(lval,e) -> (Printf.printf "set(";
-						 print_prolog_lval lval;
-						 Printf.printf ",";
-						 print_prolog_expr e;
-						 Printf.printf ")"
-					  )
 
 and print_prolog_dec dec =
 	match dec with
@@ -174,7 +168,7 @@ and print_prolog_expr e =
 	(*aps2*)
 	|ASTLen(expr) -> (Printf.printf "len(";
 												 print_prolog_expr expr;
-												 Printf.printf "])"
+												 Printf.printf ")"
 												)
 	|ASTAlloc(expr) -> (Printf.printf "alloc(";
 												 print_prolog_expr expr;
@@ -252,12 +246,10 @@ and print_prolog_type t =
 and print_prolog_types types =
 	match types with
 	ASTType(t) -> print_prolog_type t;
-	|ASTTypes(t,types) -> (Printf.printf "types(";
-								 				 print_prolog_type t;
-												 Printf.printf ",";
-												 print_prolog_types types;
-								 			 	 Printf.printf ")"
-												)
+	|ASTTypes(t,types) -> (print_prolog_type t;
+							Printf.printf ",";
+							print_prolog_types types;
+						  )
 
 let print_prolog_prog e =
 	match e with

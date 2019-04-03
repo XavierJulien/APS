@@ -51,20 +51,19 @@ block:
 
 /*aps2*/
 lval:
-	IDENT { ASTLId($1)}
+	expr { ASTLId($1)}
 	| LPAR NTH lval expr RPAR { ASTLNth($3,$4) }
 ;
 /******/
 
 stat:
 	ECHO expr {ASTEcho($2)}
-	/*aps1*/
-	| SET IDENT expr {ASTSet($2,$3)}
+	/*aps1*/ 	/*aps2 set*/
+	| SET lval expr {ASTSet($2,$3)}
 	| BIF expr block block {ASTBIf($2,$3,$4)}
 	| WHILE expr block {ASTWhile($2,$3)}
 	| CALL expr exprs {ASTCall($2,$3)}
-	/*aps2*/
-	| SET lval expr {ASTLval($2,$3)}
+
 	/******/
 ;
 

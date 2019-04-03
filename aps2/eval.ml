@@ -5,9 +5,10 @@ open Ast;;
 type valeur = InN of int
 			| InF of expr * string list * (string * valeur) list
 			| InFR of string * valeur
-			| InA of string
+			| InA of int
 			| InP of block * string list * (string * valeur) list
 			| InPR of string * valeur
+			| InB of valeur * int
 
 (* check *)
 let cpt = ref 0
@@ -74,10 +75,15 @@ and eval_block env mem s ast =
 	match ast with
 	|ASTBlock(cmds) -> eval_cmds env mem s cmds
 
+(*and eval_lval env mem ast =
+	match ast with 
+	|ASTLId(expr_id) -> eval_expr env mem expr_id*)
+
 and eval_stat env mem s ast =
 	match ast with
 	|ASTEcho(e) ->let res = eval_expr env mem e in s:=!s^(get_string res)^"\n";(mem,s)
-	|ASTSet(id,e) ->(match List.assoc id env with
+	|ASTSet(id,e) -> let id_lval = eval_lval env mem 
+						(match List.assoc id env with
 										InA(a)-> let v = (List.assoc a mem)
 														 and affect = eval_expr env mem e in
 														 	 v:= affect;
@@ -111,6 +117,8 @@ and eval_dec env mem ast =
 	|ASTVar(id,t) -> let (a,new_mem) = alloc(mem) in ((id,InA(a))::env,new_mem)
 	|ASTProc(id,args,b) -> ((id,InP(b,parse_args args,env))::env,mem)
 	|ASTProcRec(id,args,b) -> ((id,InPR(id,InP(b,parse_args args,env)))::env,mem)
+
+
 
 and eval_expr env mem ast =
 	match ast with

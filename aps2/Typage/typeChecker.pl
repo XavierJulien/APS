@@ -54,7 +54,12 @@ typeStat(C,call(id(P),ARGS),void) :-
 	assoc(P,C,arrow(ARGSTYPE,void)),
 	verif(C,ARGS,ARGSTYPE).
 
-
+/**************APS2*************/
+/*(SET)*/
+typeStat(C,set(NTH,EXPR),void) :-
+	typeExpr(C,NTH,TYPE),
+	/*assoc(ID,C,TYPE),*/
+	typeExpr(C,EXPR,TYPE).
 /*******************************/
 
 get_typeargs([],[]).
@@ -85,7 +90,7 @@ typeDec(C,funrec(ID,TYPE,ARGS,BODY),CBIS):-
 	
 	
 	
-/**************APS1*************/
+/**************APS1***************/
 
 /*(VAR)*/
 typeDec(C,var(X,TYPE),CBIS) :-
@@ -150,6 +155,19 @@ typeExpr(C,apply(apply(X,Y),ARGS),TYPERETOUR) :-
 typeExpr(C,lambda(ARGS,BODY),arrow(_,TYPEF)) :-
 	append(ARGS,C,CBIS),
 	typeExpr(CBIS,BODY,TYPEF).		
+
+/**************APS2****************/
+typeExpr(C,nth(E1,E2),TYPEL):-
+	typeExpr(C,E1,vec(TYPEL)),
+	typeExpr(C,E2,int).
+
+typeExpr(C,len(E),int):-
+	typeExpr(C,E,vec(_)).
+	
+typeExpr(C,alloc(E),vec(_)):-
+	typeExpr(C,E,int).
+	
+/**********************************/
 
 /*Opérations mathématiques*/
 typeExpr(C,add(X,Y),int) :-

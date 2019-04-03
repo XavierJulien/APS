@@ -44,13 +44,12 @@ and exprs =
 
 and stat =
 	ASTEcho of expr
-	(*aps1*)
-	| ASTSet of string * expr
+	(*aps1*) (*aps2 pour set*)
+	| ASTSet of lval * expr
 	| ASTBIf of expr * block * block
 	| ASTWhile of expr * block
 	| ASTCall of expr * exprs
-	(*aps2*)
-	| ASTLval of lval * expr
+
 
 and dec =
 	ASTConst of string * _type * expr
@@ -68,7 +67,7 @@ and cmds =
 
 (*aps2*)
 and lval =
-	ASTLId of string
+	ASTLId of expr
 	| ASTLNth of lval * expr
 
 (*aps1*)

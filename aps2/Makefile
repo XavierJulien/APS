@@ -5,7 +5,7 @@ OCAMLC = ocamlc
 all : eval
 
 eval : toProlog
-	% $(OCAMLC) lexer.cmo parser.cmo ast.cmo -o eval eval.ml
+	$(OCAMLC) lexer.cmo parser.cmo ast.cmo -o eval eval.ml
 
 
 toProlog: parser toProlog.ml
