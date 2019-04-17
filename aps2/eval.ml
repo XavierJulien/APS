@@ -20,13 +20,17 @@ let alloc mem =
 
 let allocn mem n =
 	let capture_cpt = !cpt in 
-		let rec aux memory n =
-			if n>0 then
-				let new_mem = (!cpt,ref (InN(-1)))::memory) in 
-				cpt:= !cpt+1;
-				aux new_mem (n-1) 
-			 else 
+		let rec aux memory nb =
+			if nb>0 then
+			begin
+				let new_mem = (!cpt,ref (InN(-1)))::memory in 
+					(cpt:= !cpt+1;
+					aux new_mem (nb-1)) 
+			end
+			else 
+			begin
 			 	(capture_cpt,memory) 
+			end
 			in
 	(aux mem n)
 
@@ -34,6 +38,7 @@ let allocn mem n =
 let get_int v =
 	match v with
 	| InN(e) -> e
+	| InA(a) -> a
 	| _ -> failwith "pas encore fait aussi"
 
 (* check *)
@@ -91,24 +96,27 @@ and eval_block env mem s ast =
 
 and eval_stat env mem s ast =
 	match ast with
-	|ASTEcho(e) ->let (eval_e,sigp) = eval_expr env mem e in s:=!s^(get_string res)^"\n";(sigp,s)
+	|ASTEcho(e) ->let (eval_e,sigp) = eval_expr env mem e in 
+					s:=!s^(get_string eval_e)^"\n";
+					(sigp,s)
 	|ASTSet(lval_id,e) -> let (v,sigp) = eval_expr env mem e in 
-							let (adr,sigpp) = eval_lval env sigp lval in
+							let (adr,sigpp) = eval_lval env sigp lval_id in
 								let value = List.assoc adr sigpp in 
-									value:=v in (sigpp,s)
+									value:=v;(sigpp,s)
 	|ASTBIf(e,b1,b2) -> let (eval_e,sigp) = (eval_expr env mem e) in 
 							if eval_e = InN(1) 
-							then (eval_block env sigp b1)	
-							else (eval_block env sigp b2) 
+							then (eval_block env sigp s b1)	
+							else (eval_block env sigp s b2) 
 	|ASTWhile(e,b) ->
 			let (eval_e,sigp) = (eval_expr env mem e) in 
 			if eval_e = InN(0)
 			then (sigp,s)
 			else let (sigpp,new_s) = (eval_block env sigp s b) in
 				eval_stat env sigpp new_s ast
-	|ASTCall(p,args) -> let (eval_p,sigp) = eval_expr env mem p and args_sig_list = eval_args env sigp args in
-							let (valargs_list,sig_list) = List.split args_sig_list in 
-							let last_sig = List.nth sig_list ((List.length sig_list)-1) in
+	|ASTCall(p,args) -> let (eval_p,sigp) = eval_expr env mem p in 
+						let args_sig_list = eval_args env sigp args in
+						let (valargs_list,sig_list) = List.split args_sig_list in 
+						let last_sig = List.nth sig_list ((List.length sig_list)-1) in
 												(match eval_p with
 													|InP(block,params,env1) ->
 														 let closure_env = (List.map2 (fun x y -> (x,y)) params valargs_list)@env1 in
@@ -122,14 +130,25 @@ and eval_stat env mem s ast =
 (*aps2*)
 and eval_lval env mem ast =
 	match ast with 
-	|ASTLId(ASTid(id)) -> (match (List.assoc id env) with
+	(*|ASTLId(aid) -> (match aid with 
+					|ASTId(id) ->  
+						(match (List.assoc id env) with
 					  	  |InA(a) -> (a,mem)
-				  	  	  |InB(a,size) -> (a,mem))
+				  	  	  |InB(a,size) -> (get_int a,mem)
+				  	  	  |_ -> failwith "id n'est pas une adresse ou un bloc")
+					|_ -> failwith "jkjkjkkkkkkkkkkkkkkkkkkkkkkkk")*)
+	
+	|ASTLId(a) -> let (inb,new_mem) = eval_expr env mem a in
+					(match inb with 
+					|InB(b,n) -> print_string "salut";((get_int b),new_mem)
+					|InA(a) -> (2,new_mem)
+					|InN(n) -> (0,new_mem) 
+					|_ -> (1,new_mem))
 	|ASTLNth(lval, expr) -> let (adr,sigm) = eval_lval env mem lval in
 								let (index,sigprim) = eval_expr env sigm expr in 
 									(adr+(get_int index),sigprim)
-									
-									 
+
+
 
 (* check *)
 and eval_dec env mem ast =
@@ -149,14 +168,16 @@ and eval_expr env mem ast =
 	|ASTFalse -> (InN(0),mem)
 	|ASTNum(n) -> (InN(n),mem)
 	|ASTId(id) -> (match (List.assoc id env) with
-				  |InA(a) -> (!(List.assoc a mem),mem)
-				  |v -> (v,mem))
+				  |InA(a) -> print_string "d'une phrase";(!(List.assoc a mem),mem)
+				  |InB(a,n) -> print_string "InB";(InB(a,n),mem)
+				  |v -> print_string "d'une autre phrase";(v,mem))
 	|ASTLambda(args,e) -> (InF(e,parse_args args,env),mem)
 	|ASTIf(e1,e2,e3) -> let (eval_e1,sigp) = (eval_expr env mem e1) in 
 							if eval_e1 = InN(1) 
 							then (eval_expr env sigp e2)	
 							else (eval_expr env sigp e3)
-	|ASTApply(e,args) -> let (fermeture,sigp) = eval_expr env mem e  and args_sig_list = eval_args env sigp args in
+	|ASTApply(e,args) -> let (fermeture,sigp) = eval_expr env mem e in 
+					     let args_sig_list = eval_args env sigp args in
 							let (valargs_list,sig_list) = List.split args_sig_list in 
 							let last_sig = List.nth sig_list ((List.length sig_list)-1) in
 												(match fermeture with
@@ -166,7 +187,7 @@ and eval_expr env mem ast =
 															let closure_env =(f,List.assoc f env)::(List.map2 (fun x y -> (x,y)) params valargs_list)@env1 in
 													 															(eval_expr closure_env last_sig body)
 													|_ -> failwith "erreur : impossible d'appliquer une valeur entière")
-	|ASTOprim(oprim) ->w
+	|ASTOprim(oprim) -> 
 				(match oprim with
 						|ASTUnary(opun,arg) ->
 							let (v,sigp) = eval_expr env mem arg in
@@ -174,7 +195,8 @@ and eval_expr env mem ast =
 								|Not -> (InN(pi_un "not" (get_int v)),sigp)
 								)
 						|ASTBinary(opbin,arg1,arg2) ->
-												let (aa1,sigp) = eval_expr env mem arg1 and (aa2,sigpp) = eval_expr env sigp arg2 in
+												let (aa1,sigp) = eval_expr env mem arg1 in 													
+												let	(aa2,sigpp) = eval_expr env sigp arg2 in
 													let a1 = get_int aa1 and a2 = get_int aa2 in 
 													match opbin with
 													| And -> (InN(pi_bin "and" a1 a2),sigpp)
@@ -186,19 +208,18 @@ and eval_expr env mem ast =
 													| Mul -> (InN(pi_bin "mul" a1 a2),sigpp)
 													| Div -> (InN(pi_bin "div" a1 a2),sigpp))
 	(*aps2*)
-	|ASTAlloc(e) -> let (n,sigp) = eval_expr env mem e in 
-						let (adr,sigpp) = allocn(mem,n) in 
-							(InB(adr,n),sigpp)
+	|ASTAlloc(e) -> let (n,sigp) = eval_expr env mem e in (*n -> InN(n)*)
+					let (adr,sigpp) = (allocn sigp (get_int n)) in (InB(InA(adr),(get_int n)),sigpp)
 	|ASTLen(e) -> let (inbloc,sigp) = eval_expr env mem e in 
 					(match inbloc with 
 					|InB(adr,n) -> (InN(n),sigp)
 					|_ -> failwith "Error ASTLen : not a InB after evaluation")
 	|ASTENth(e1,e2) -> let (inbloc,sigp) = eval_expr env mem e1 in 
-						let (inn,sigpp) = eval_expr env mem e2 in 	
+						let (inn,sigpp) = eval_expr env sigp e2 in 	
 						let i = get_int inn in 
 						begin
 						match inbloc with 
-							|InB(a,n) -> let v = (List.assoc (a+i) sigpp) in (v,sigpp)
+							|InB(a,n) -> let v = (List.assoc ((get_int a)+i) sigpp) in (!v,sigpp)
 							|_ -> failwith "Error ASTENth : not a InB after evaluation" 					
 						end
 
