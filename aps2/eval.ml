@@ -100,17 +100,7 @@ and eval_stat env mem s ast =
 	|ASTSet(lval_id,e) -> let (inbloc,sigp) = eval_expr env mem e in
 							let (adr,sigpp) = eval_lval env sigp lval_id in
 								let value = List.assoc (get_int adr) sigpp in
-								(*Printf.printf "l adresse est %d \n" (get_int adr);
-								    (match !value with
-                                    |InB(a,b) -> Printf.printf "avant le set la valeur est un bloc de adr debut = %d\n" (get_int !value)
-                                    |InN(a) -> Printf.printf "avant le set la valeur est un int =  %d\n" (get_int !value);
-                                    |_ -> print_endline "ni bloc ni inn");*)
 									value:=inbloc;
-								(*	(match !value with
-									|InB(a,b) -> Printf.printf "apres le set la valeur est un bloc de adr debut = %d\n" (get_int !value)
-									|InN(a) -> Printf.printf "apres le set la valeur est un int =  %d\n" (get_int !value);
-									|_ -> print_endline "ni bloc ni inn";
-									print_newline ()); *)
 									(sigpp,s)
 	|ASTBIf(e,b1,b2) -> let (eval_e,sigp) = (eval_expr env mem e) in 
 							if eval_e = InN(1) 
@@ -146,14 +136,6 @@ and eval_lval env mem ast =
 				  	  	  |InB(a,size) -> (InB(a,size),mem)
 				  	  	  |_ -> failwith "id n'est pas une adresse ou un bloc")
 					|_ -> failwith "dans eval_lval erreur impossible")
-	
-	(*|ASTLId(a) -> print_endline "dans ASTLId avant d'appeler eval expr";
-	                let (inb,new_mem) = eval_expr env mem a in
-					(match inb with 
-					|InB(b,n) -> print_string "salut";((get_int b),new_mem)
-					|InA(a) -> print_endline "est un inA";(2,new_mem)
-					|InN(n) -> print_endline "inN dans eval_lval";(0,new_mem)
-					|_ -> (1,new_mem)) *)
 	|ASTLNth(lval, expr) -> let (retour_eval_lval,sigm) = eval_lval env mem lval in
                             	let (index,sigprim) = eval_expr env sigm expr in
                                     match retour_eval_lval,index with
@@ -162,15 +144,6 @@ and eval_lval env mem ast =
                                                            		|InB(adre,size) -> (InA((get_int adre)+i),sigprim)
                                                            		|_ -> failwith "ASTLNth cas matching impossible")
                                        |_ -> failwith "ASTLNth cas matching impossible extérieur"
-
-
-
-	                          (* let (adr_debut,sigm) = eval_lval env mem lval in
-								let (index,sigprim) = eval_expr env sigm expr in
-									let valeur = !(List.assoc (adr_debut+(get_int index)) sigprim) in
-									  (match valeur with
-									    |InB(adre,size) -> (get_int adre,sigprim)
-									    |_ -> (1,sigprim)) *)
 
 
 
@@ -240,10 +213,9 @@ and eval_expr env mem ast =
 	|ASTENth(e1,e2) -> let (inbloc,sigp) = eval_expr env mem e1 in
 						let (inn_index,sigpp) = eval_expr env sigp e2 in
 						let index = get_int inn_index in
-						Printf.printf "c'est le cb eme element %d\n" index;
 						begin
 						match inbloc with
-							|InB(a,n) -> Printf.printf "adresse = %d\n" ((get_int a)+index);let v = (List.assoc ((get_int a)+index) sigpp) in (match !v with |InB(a,b) -> Printf.printf "ououououououo adresse = %d taille = %d" (get_int a) b| InN(x) -> print_int x | _ -> print_endline "iiuiuiuiuiuiuiuiu");(!v,sigpp)
+							|InB(a,n) -> let v = (List.assoc ((get_int a)+index) sigpp) in (!v,sigpp)
 							|_ -> failwith "Error ASTENth : not a InB after evaluation"
 						end
 
