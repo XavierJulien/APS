@@ -100,17 +100,17 @@ and eval_stat env mem s ast =
 	|ASTSet(lval_id,e) -> let (inbloc,sigp) = eval_expr env mem e in
 							let (adr,sigpp) = eval_lval env sigp lval_id in
 								let value = List.assoc (get_int adr) sigpp in
-								(*Printf.printf "l adresse est %d \n" (get_int adr);
+								Printf.printf "l adresse est %d \n" (get_int adr);
 								    (match !value with
                                     |InB(a,b) -> Printf.printf "avant le set la valeur est un bloc de adr debut = %d\n" (get_int !value)
                                     |InN(a) -> Printf.printf "avant le set la valeur est un int =  %d\n" (get_int !value);
-                                    |_ -> print_endline "ni bloc ni inn");*)
+                                    |_ -> print_endline "ni bloc ni inn");
 									value:=inbloc;
-								(*	(match !value with
+									(match !value with
 									|InB(a,b) -> Printf.printf "apres le set la valeur est un bloc de adr debut = %d\n" (get_int !value)
 									|InN(a) -> Printf.printf "apres le set la valeur est un int =  %d\n" (get_int !value);
 									|_ -> print_endline "ni bloc ni inn";
-									print_newline ()); *)
+									print_newline ());
 									(sigpp,s)
 	|ASTBIf(e,b1,b2) -> let (eval_e,sigp) = (eval_expr env mem e) in 
 							if eval_e = InN(1) 

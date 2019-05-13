@@ -41,6 +41,7 @@ cmds:
 	stat {ASTStat($1)}
 	| dec SEMICOLON cmds {ASTDec($1,$3)}
 	| stat SEMICOLON cmds {ASTStats($1,$3)}
+	| ret {ASTCmdReturn($1)}
 ;
 
 /*aps1*/
@@ -55,6 +56,13 @@ lval:
 	| LPAR NTH lval expr RPAR { ASTLNth($3,$4) }
 ;
 /******/
+
+/*aps3*/
+ret:
+    RETURN expr {ASTReturn($2)}
+;
+/******/
+
 
 stat:
 	ECHO expr {ASTEcho($2)}
