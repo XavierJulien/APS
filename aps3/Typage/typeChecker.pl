@@ -18,17 +18,21 @@ typeProg(C,prog(X),void) :-
 typeCmds(_,[epsilon],void).
 
 /**************APS3*************/
+	
+/*(STAT2)*/
+/*le fait de passer "epsilon" à la place de "_" fait que cela ne fonctionne plus pour le programme prog301 car il est censé y passer. Malheuresement, ca fait des verifications supplémentaires pour les autres programmes*/
+typeCmds(C,[stat(X)|_],T) :- 
+	T \= void,
+	typeStat(C,X,T),
+	typeCmds(C,[epsilon],void).	
+	
+
 /*(STAT0)*/
 typeCmds(C,[stat(X)|Y],T) :-
 	typeStat(C,X,void),
 	typeCmds(C,Y,T).
 
-	
-/*(STAT2)*/
-typeCmds(C,[stat(X)|epsilon],T) :-
-	T \= void,
-	typeStat(C,X,T),
-	typeCmds(C,[epsilon],void).	
+
 
 /*(STAT1)*/
 typeCmds(C,[stat(X)|Y],T) :-
@@ -258,7 +262,6 @@ typeBlock(C,block(X),void) :-
 	typeCmds(C,X,void).
 /*******APS3******/
 typeBlock(C,block(X),T) :-
-	T \= void,
 	typeCmds(C,X,T).
 
 /*****************/
