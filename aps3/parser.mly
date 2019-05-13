@@ -13,6 +13,8 @@ open Ast
 %token VAR PROC SET BIF WHILE CALL VOID
 /*aps2*/
 %token LEN NTH ALLOC VEC
+/*aps3*/
+%token RETURN
 %start prog             /* the entry point */
 
 %type <Ast.prog> prog
@@ -30,6 +32,8 @@ open Ast
 %type <Ast.block> block
 /*aps2*/
 %type <Ast.lval> lval
+/*aps3*/
+%type <Ast.ret> ret
 /******/
 %%
 
@@ -83,6 +87,9 @@ dec:
 	| VAR IDENT _type {ASTVar($2,$3)}
 	| PROC IDENT LBRACKET args RBRACKET block {ASTProc($2,$4,$6)}
 	| PROC REC IDENT LBRACKET args RBRACKET block {ASTProcRec($3,$5,$7)}
+	/*aps3*/
+	| FUN IDENT _type LBRACKET args RBRACKET block   {ASTFunRet($2,$3,$5,$7)}
+	| FUN REC IDENT _type LBRACKET args RBRACKET block  {ASTFunRecRet($3,$4,$6,$8)}
 	/******/
 ;
 

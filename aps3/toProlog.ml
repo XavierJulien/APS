@@ -16,6 +16,13 @@ let rec print_prolog_cmds cmds =
 					         Printf.printf "),";
 					         print_prolog_cmds cmds;
 					        )
+	(*aps3*)
+	|ASTCmdReturn(ret) -> (Printf.printf "return(";
+						   print_prolog_ret ret;
+						   Printf.printf ")";
+						   Printf.printf ",epsilon"
+						  )
+						   
 (*aps1*)
 and print_prolog_block block =
 	match block with
@@ -117,7 +124,32 @@ and print_prolog_dec dec =
 													 print_prolog_block b;
 													 Printf.printf ")";
 													)
-
+	(*aps3*)
+	|ASTFunRet(id,t,args,b) -> (Printf.printf "funret(%s," id;
+													 print_prolog_type t;
+													 Printf.printf ",";
+													 Printf.printf "[";
+													 print_prolog_args args;
+													 Printf.printf "]";
+													 Printf.printf ",";
+													 print_prolog_block b;
+													 Printf.printf ")";
+													)
+	|ASTFunRecRet(id,t,args,b) -> (Printf.printf "funrecret(%s," id;
+													 print_prolog_type t;
+													 Printf.printf ",";
+													 Printf.printf "[";
+													 print_prolog_args args;
+													 Printf.printf "]";
+	 												 Printf.printf ",";
+													 print_prolog_block b;
+													 Printf.printf ")";
+													)
+(*aps3*)
+and print_prolog_ret r = 
+	match r with 
+	ASTReturn(e) ->  print_prolog_expr e;
+	
 and print_prolog_exprs e =
 	match e with
 	ASTExpr(e) ->  print_prolog_expr e;

@@ -59,6 +59,9 @@ and dec =
 	| ASTVar of string * _type
 	| ASTProc of string * args * block
 	| ASTProcRec of string * args * block
+	(*aps3*)
+	| ASTFunRet of string * _type * args * block
+	| ASTFunRecRet of string * _type * args * block
 
 and cmds =
 	ASTStat of stat

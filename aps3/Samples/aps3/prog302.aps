@@ -1,9 +1,9 @@
 [
-  FUN f int [x:bool] [
+  FUN f int [x:int] [
     IF x
       [ RETURN 42 ]
       [ ECHO x ];
     RETURN 41
   ];
-  ECHO (f true)
+  ECHO (f 0)
 ]

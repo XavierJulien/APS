@@ -17,9 +17,30 @@ typeProg(C,prog(X),void) :-
 /*(END)*/
 typeCmds(_,[epsilon],void).
 
-typeCmds(C,[stat(X)|Y],void) :-
+/**************APS3*************/
+/*(STAT0)*/
+typeCmds(C,[stat(X)|Y],T) :-
 	typeStat(C,X,void),
-	typeCmds(C,Y,void).
+	typeCmds(C,Y,T).
+
+	
+/*(STAT2)*/
+typeCmds(C,[stat(X)|epsilon],T) :-
+	T \= void,
+	typeStat(C,X,T),
+	typeCmds(C,[epsilon],void).	
+
+/*(STAT1)*/
+typeCmds(C,[stat(X)|Y],T) :-
+	T \= void,
+	typeStat(C,X,T),
+	typeCmds(C,Y,T).
+
+	
+/*(RET)*/
+typeCmds(C,[return(E)|_],T) :-
+	typeExpr(C,E,T).
+
 
 /*(DEC)*/
 typeCmds(C,[dec(X)|Y],void) :-
@@ -38,37 +59,26 @@ typeStat(C,set(id(ID),EXPR),void) :-
 	assoc(ID,C,TYPE),
 	typeExpr(C,EXPR,TYPE).
 
-/*(BIF) de aps2 */
-/*typeStat(C,bif(COND,B1,B2),void) :-
-	typeExpr(C,COND,bool),
-	typeBlock(C,B1,void),
-	typeBlock(C,B2,void).*/
-
-/*(BIF) de aps3 */
+/*(BIF)*/
 typeStat(C,bif(COND,B1,B2),T) :-
 	typeExpr(C,COND,bool),
 	typeBlock(C,B1,T),
 	typeBlock(C,B2,T).
 
-typeStat(C,bif(COND,B1,B2),tplusvoid) :-
+typeStat(C,bif(COND,B1,B2),T) :-
+	T \= void,
 	typeExpr(C,COND,bool),
 	typeBlock(C,B1,void),
-	typeBlock(C,B2,T),
-	T \= void.
+	typeBlock(C,B2,T).
 
-typeStat(C,bif(COND,B1,B2),tplusvoid) :-
+typeStat(C,bif(COND,B1,B2),T) :-
+	T \= void,
 	typeExpr(C,COND,bool),
 	typeBlock(C,B1,T),
-	typeBlock(C,B2,void),
-	T \= void.
+	typeBlock(C,B2,void).
 
 /*(WHILE)*/
-/*typeStat(C,while(COND,B),void) :-
-	typeExpr(C,COND,bool),
-	typeBlock(C,B,void).*/
-
-/*(WHILE) de aps3*/
-typeStat(C,while(COND,B),tplusvoid) :-
+typeStat(C,while(COND,B),T) :-
 	typeExpr(C,COND,bool),
 	typeBlock(C,B,T).
 	
@@ -110,7 +120,22 @@ typeDec(C,funrec(ID,TYPE,ARGS,BODY),CBIS):-
 	typeExpr(C4,BODY,TYPE),
 	CBIS=[(ID,arrow(RES,TYPE))|C].
 
+/**************APS3***************/
+
+/*(FUNP)*/
+typeDec(C,funret(ID,TYPERETOUR,ARGS,BODY),CBIS):-
+	append(ARGS,C,CTER),
+	typeBlock(CTER,BODY,TYPERETOUR),
+	get_typeargs(ARGS,RES),
+	CBIS=[(ID,arrow(RES,TYPERETOUR))|C].
 	
+/*(FUNRECP)*/
+typeDec(C,funrecret(ID,TYPE,ARGS,BODY),CBIS):-
+	get_typeargs(ARGS,RES),
+	append(ARGS,C,CTER),
+	C4 = [(ID,arrow(RES,TYPE))|CTER],
+	typeBlock(C4,BODY,TYPE),
+	CBIS=[(ID,arrow(RES,TYPE))|C].
 	
 	
 /**************APS1***************/
@@ -231,6 +256,10 @@ typeExpr(C,not(X),bool) :-
 /*******APS1******/
 typeBlock(C,block(X),void) :-
 	typeCmds(C,X,void).
+/*******APS3******/
+typeBlock(C,block(X),T) :-
+	T \= void,
+	typeCmds(C,X,T).
 
 /*****************/
 	
